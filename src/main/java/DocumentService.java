@@ -28,7 +28,7 @@ public class DocumentService {
     private Tbl createTable(List<NistTestResult> tests, WordprocessingMLPackage wordPackage) {
         int writableWidthTwips = wordPackage.getDocumentModel()
                 .getSections().get(0).getPageDimensions().getWritableWidthTwips();
-        int columnNumber = 9;
+        int columnNumber = 8;
         Tbl tbl = TblFactory.createTable(tests.size()+1, columnNumber, writableWidthTwips/columnNumber);
         List<Object> rows = tbl.getContent();
         Tr header = (Tr)rows.get(0);
@@ -45,14 +45,23 @@ public class DocumentService {
         List<P> ps = new ArrayList<P>();
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getScenario())));
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getSize())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpNonOverlapping())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpSerial())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpOnes())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpCumulative())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpEnthropy())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpMatrix())));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText(String.valueOf(test.getpSpectral())));
+        ps.add(createP(test.getpNonOverlapping(),wordPackage));
+        ps.add(createP(test.getpSerial(),wordPackage));
+        ps.add(createP(test.getpOnes(),wordPackage));
+        ps.add(createP(test.getpCumulative(),wordPackage));
+        ps.add(createP(test.getpEnthropy(),wordPackage));
+        ps.add(createP(test.getpSpectral(),wordPackage));
         return ps;
+    }
+
+    private P createP(double value,WordprocessingMLPackage wordPackage) {
+        if(value<0.01){
+            return wordPackage.getMainDocumentPart().createParagraphOfText(value+"/"+"nonrandom");
+        }
+        else if(value>0.01){
+            return wordPackage.getMainDocumentPart().createParagraphOfText(value+"/"+"random");
+        }
+        return null;
     }
 
     private List<P> headerToP(WordprocessingMLPackage wordPackage){
@@ -64,7 +73,6 @@ public class DocumentService {
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText("Ones"));
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText("Cumulative"));
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText("Enthropy"));
-        ps.add(wordPackage.getMainDocumentPart().createParagraphOfText("Matrix"));
         ps.add(wordPackage.getMainDocumentPart().createParagraphOfText("Spectral"));
         return ps;
     }
